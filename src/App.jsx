@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ProductGrid } from "./components/ProductGrid";
 import "./App.css";
 
@@ -13,25 +14,63 @@ const produtos = [
 ];
 
 export default function App() {
-  // Altere este valor para filtrar: "notebook", "celular", "audio", "wearable"
-  const categoriaAtiva = "notebook";
 
-  const filtrados = produtos.filter(p => p.categoria === categoriaAtiva);
+  const [categoriaAtiva, setCategoriaAtiva] = useState("todos");
+  const [busca, setBusca] = useState("");
+  const filtrados = produtos
+  .filter(p => categoriaAtiva === "todos" || p.categoria === categoriaAtiva)
+  .filter(p => p.nome.toLowerCase().includes(busca.toLowerCase()));
 
   return (
     <div className="container">
       <header className="header">
-        <span className="badge">New Collection 2026</span>
-        <h1 className="title">Smart<span>Catalog</span></h1>
-        <p className="subtitle">
-          Exibindo categoria: <strong>{categoriaAtiva}</strong> ({filtrados.length} itens)
-        </p>
-      </header>
+       <span className="badge">New Collection 2026</span>
+       <h1 className="title">Smart<span>Catalog</span></h1>
+       <p className="subtitle">
+       Exibindo {filtrados.length} produto{filtrados.length !== 1 ? "s" : ""}
+       </p>
 
-      <ProductGrid items={filtrados} />
+       <div className="controls">
+       <select
+         className="filter-select"
+         value={categoriaAtiva}
+         onChange={(e) => setCategoriaAtiva(e.target.value)}
+         >
+         <option value="todos">Todos</option>
+         <option value="notebook">Notebook</option>
+         <option value="celular">Celular</option>
+         <option value="audio">Áudio</option>
+         <option value="wearable">Wearable</option>
+         </select>
+
+          <input
+          className="search-input"
+          type="text"
+          placeholder="Buscar produto..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          />
+
+          <button
+            className="limpar-btn"
+            onClick={() => {
+            setBusca("");
+            setCategoriaAtiva("todos");
+            }}
+            >Limpar filtros</button>
+      </div>
+    </header>
+
+      {filtrados.length === 0 ? (
+    <p className="empty-state">
+     Nenhum produto encontrado para "{busca}" em {categoriaAtiva === "todos" ? "todas as categorias" : categoriaAtiva}.
+    </p>
+   ) : (
+   <ProductGrid items={filtrados} />
+   )}
 
       <footer className="footer">
-        <p>Material Didático | Prof. Rafael Liberato</p>
+        <p>Atividade de aula - DW2</p>
       </footer>
     </div>
   );
